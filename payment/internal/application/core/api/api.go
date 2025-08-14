@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"time"
 
 	"github.com/huseyinbabal/microservices/payment/internal/application/core/domain"
 	"github.com/huseyinbabal/microservices/payment/internal/ports"
@@ -20,6 +21,9 @@ func NewApplication(db ports.DBPort) *Application {
 }
 
 func (a Application) Charge(ctx context.Context, payment domain.Payment) (domain.Payment, error) {
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	defer cancel()
+
 	if payment.TotalPrice > 1000 {
 		return domain.Payment{}, status.Errorf(codes.InvalidArgument, "Payment over 1000 is not allowed.")
 	}
